@@ -1,1 +1,2 @@
-/Python/.idea/
+*.idea*
+/Python/__pycache__/
