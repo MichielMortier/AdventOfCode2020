@@ -1,8 +1,7 @@
-use lazy_static::lazy_static;
 use regex::Regex;
 
-lazy_static! {
-    static ref RE: Regex = Regex::new(r"(?P<comm>\w+) (?P<sign>[+-])(?P<val>\d+)").unwrap();
+thread_local! {
+    static RE: Regex = Regex::new(r"(?P<comm>\w+) (?P<sign>[+-])(?P<val>\d+)").unwrap();
 }
 
 struct State {
@@ -11,7 +10,7 @@ struct State {
 }
 
 fn exec_line(line: &str, state: &mut State) {
-    let cap = RE.captures(line).unwrap();
+    let cap = RE.with(|f| f.captures(line).unwrap());
     let comm = cap.name("comm").unwrap();
     let sign = cap.name("sign").unwrap();
     let val = cap.name("val").unwrap();

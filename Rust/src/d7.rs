@@ -5,12 +5,11 @@ use std::{
     rc::Rc,
 };
 
-use lazy_static::lazy_static;
 use regex::Regex;
 
-lazy_static! {
-    static ref RE: Regex = Regex::new(r"(?P<name>\w+ \w+) bags").unwrap();
-    static ref RE2: Regex = Regex::new(r"(?P<n>\d+) (?P<name>\w+ \w+)").unwrap();
+thread_local! {
+    static RE: Regex = Regex::new(r"(?P<name>\w+ \w+) bags").unwrap();
+    static RE2: Regex = Regex::new(r"(?P<n>\d+) (?P<name>\w+ \w+)").unwrap();
 }
 
 type BagPtr = Rc<RefCell<Bag>>;
@@ -51,12 +50,13 @@ fn parse_file(path: &str) -> HashMap<String, BagPtr> {
 
     for line in read_to_string(path).unwrap().lines() {
         let mut split = line.split(" contain ");
-        let name = RE
-            .captures(split.next().unwrap())
-            .unwrap()
-            .name("name")
-            .unwrap()
-            .as_str();
+        let name = RE.with(|f| {
+            f.captures(split.next().unwrap())
+                .unwrap()
+                .name("name")
+                .unwrap()
+                .as_str()
+        });
 
         let parent = get_or_insert(&mut map, name, |n| Bag::new_ptr(n, Vec::new()));
 
@@ -64,7 +64,7 @@ fn parse_file(path: &str) -> HashMap<String, BagPtr> {
             .next()
             .unwrap()
             .split(", ")
-            .filter_map(|s| RE2.captures(s))
+            .filter_map(|s| RE2.with(|f| f.captures(s)))
             .map(|s| {
                 (
                     {

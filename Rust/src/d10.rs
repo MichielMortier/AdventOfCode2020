@@ -54,7 +54,7 @@ fn find_num_muts(
 mod test {
     use std::{fs::read_to_string, time::Instant};
 
-    use super::{find_mut, find_num_muts};
+    use super::find_mut;
 
     #[test]
     fn d10p1() {

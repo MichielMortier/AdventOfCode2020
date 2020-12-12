@@ -1,8 +1,9 @@
-use lazy_static::lazy_static;
+use std::thread_local;
+
 use regex::Regex;
 
-lazy_static! {
-    static ref RE: Regex =
+thread_local! {
+    static RE: Regex =
         Regex::new(r"(?P<low>\d+)-(?P<high>\d+) (?P<key>\w): (?P<pw>\w+)").unwrap();
 }
 
@@ -15,7 +16,7 @@ pub struct Password {
 
 impl Password {
     pub fn new(input: &str) -> Password {
-        let matches = RE.captures(input).unwrap();
+        let matches = RE.with(|re| re.captures(input).unwrap());
         let key = matches
             .name("key")
             .unwrap()
@@ -55,7 +56,7 @@ pub fn _validate_password2(input: &str) -> bool {
 mod test {
     use std::fs::read_to_string;
 
-    use crate::password::{_validate_password1, _validate_password2};
+    use super::{_validate_password1, _validate_password2};
 
     #[test]
     fn d2p1() {

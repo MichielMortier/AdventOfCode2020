@@ -1,11 +1,10 @@
 use std::{collections::HashMap, fs::read_to_string};
 
-use lazy_static::lazy_static;
 use regex::Regex;
 
-lazy_static! {
-    static ref HCL_RE: Regex = Regex::new(r"#[0-9a-f]{6}").unwrap();
-    static ref ECL: Vec<String> = vec![
+thread_local! {
+    static HCL_RE: Regex = Regex::new(r"#[0-9a-f]{6}").unwrap();
+    static ECL: Vec<String> = vec![
         "amb".to_owned(),
         "blu".to_owned(),
         "brn".to_owned(),
@@ -65,8 +64,8 @@ fn is_valid1(pass: &Passport) -> bool {
                     return v >= 59 && v <= 76;
                 }
             }
-            "hcl" => HCL_RE.is_match(&pass["hcl"]),
-            "ecl" => ECL.contains(&pass["ecl"]),
+            "hcl" => HCL_RE.with(|f| f.is_match(&pass["hcl"])),
+            "ecl" => ECL.with(|f| f.contains(&pass["ecl"])),
             "pid" => pass["pid"].len() == 9 && pass["pid"].chars().all(char::is_numeric),
             "cid" => true,
             _ => false,
