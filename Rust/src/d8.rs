@@ -1,8 +1,7 @@
-use lazy_static::lazy_static;
 use regex::Regex;
 
-lazy_static! {
-    static ref RE: Regex = Regex::new(r"(?P<comm>\w+) (?P<sign>[+-])(?P<val>\d+)").unwrap();
+thread_local! {
+    static RE: Regex = Regex::new(r"(?P<comm>\w+) (?P<sign>[+-])(?P<val>\d+)").unwrap();
 }
 
 struct State {
@@ -11,7 +10,7 @@ struct State {
 }
 
 fn exec_line(line: &str, state: &mut State) {
-    let cap = RE.captures(line).unwrap();
+    let cap = RE.with(|f| f.captures(line).unwrap());
     let comm = cap.name("comm").unwrap();
     let sign = cap.name("sign").unwrap();
     let val = cap.name("val").unwrap();
@@ -57,13 +56,13 @@ mod test {
     #[test]
     fn d8p2() {
         let lines = read_to_string("res/reddit/d8").unwrap();
-        let lines: Vec<_> = lines.lines().collect();
+        let lines: Vec<_> = lines.lines().map(|s| s.to_string()).collect();
 
         for i in 0..lines.len() {
             let mut state = State { line: 0, acc: 0 };
             let mut seen_lines = HashSet::<i64>::new();
 
-            let mut lines_c: Vec<_> = lines.clone().iter().map(|s| s.to_string()).collect();
+            let mut lines_c: Vec<_> = lines.clone();
             if lines_c[i].contains("nop") {
                 lines_c[i] = lines_c[i].replace("nop", "jmp");
             } else if lines_c[i].contains("jmp") {
