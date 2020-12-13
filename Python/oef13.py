@@ -76,3 +76,5 @@ def solve2(file_name):
         if not is_not_correct:
             break
     print(counter - list(offset.keys())[0])
+
+    # Chinese Remainder Theorem is de efficient manier om dit op te lossen met een algoritme
