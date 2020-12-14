@@ -27,12 +27,12 @@ def represents_int(s):
 
 def solve2(file_name):
     lines = FileHandler(file_name).get_file_lines()
-    number_of_minutes = int(lines[0])
     all_buses = [time for time in lines[1].split(',')]
     offset = {}
     for number in all_buses:
         if represents_int(number):
             offset[int(number)] = all_buses.index(number)
+    print(find_Y(offset))
     # highest_number = max(filter(lambda x: represents_int(x), all_buses))
     # highest_number_offset = offset[int(highest_number)]
     # for number in offset:
@@ -78,3 +78,39 @@ def solve2(file_name):
     print(counter - list(offset.keys())[0])
 
     # Chinese Remainder Theorem is de efficient manier om dit op te lossen met een algoritme
+
+
+# Chinese Remainder theorem implementation
+def find_Y(mod_and_rest_combination):
+    for number in mod_and_rest_combination:
+        mod_and_rest_combination[number] = (number - mod_and_rest_combination[number]) % number
+    print(mod_and_rest_combination)
+    # eerst zoeken we M, de totale modulo die we op het einde moeten nemen om Y te vinden
+    # Y = R mod M
+    # M is multiplication van alle mods
+    M = functools.reduce(lambda a, b: a * b, list(mod_and_rest_combination.keys()))
+    # nu zoeken we de componeten voor R
+    # R is de som van alle mx * mx' * restx
+    # mx is M/modx
+    mx = [M / modx for modx in mod_and_rest_combination.keys()]
+    # mx' is (mx)^-1 mod nx
+    mx_accent = [mul_inv(mx_element, modx) for (mx_element, modx) in zip(mx, mod_and_rest_combination.keys())]
+
+    # again: R is de som van alle mx * mx' * restx
+    R = sum([mx_element * mx_accent_element * restx for mx_element, mx_accent_element, restx in
+             zip(mx, mx_accent, mod_and_rest_combination.values())])
+    Y = R % M
+    return Y
+
+# inverse module zoeken:
+# a mod b -> inverse is ax mod b = 1 => zoek x
+def mul_inv(a, b):
+    b0 = b
+    x0, x1 = 0, 1
+    if b == 1: return 1
+    while a > 1:
+        q = a // b
+        a, b = b, a%b
+        x0, x1 = x1 - q * x0, x0
+    if x1 < 0: x1 += b0
+    return x1
