@@ -1,5 +1,6 @@
 from file_handler import FileHandler
 import functools
+import time
 
 
 def solve(file_name):
@@ -26,8 +27,8 @@ def solve(file_name):
     print(last_number)
 
 
-
 def solve2(file_name):
+    beginTime = time.time()
     lines = FileHandler(file_name).get_file_lines()
     mem = {}
     last_number = 0
@@ -48,4 +49,6 @@ def solve2(file_name):
         last_number = next_number
         # print(next_number)
         turn += 1
+    endtime = time.time()
+    print(endtime - beginTime)
     print(last_number)

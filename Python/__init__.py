@@ -13,6 +13,7 @@ import oef12
 import oef13
 import oef14
 import oef15
+import oef16
 
 if __name__ == "__main__":
     # solve("files/oefening1.txt")
@@ -58,4 +59,7 @@ if __name__ == "__main__":
     # oef14.solve2("files/oefening14.txt")
 
     # oef15.solve("files/oefening15.txt")
-    oef15.solve2("files/oefening15.txt")
+    # oef15.solve2("files/oefening15.txt")
+
+    # oef16.solve("files/oefening16.txt")
+    oef16.solve2("files/oefening16.txt")
