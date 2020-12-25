@@ -1,5 +1,4 @@
 input = ["12232269", "19452773"]
-# input = ["5764801", "17807724"]
 
 def solve(file_name):
     loop_size = []
